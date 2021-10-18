@@ -14,17 +14,24 @@ answer_holder = "";
 score = 0;
 
 function preload(){
-
+    classifier = ml5.imageClassifier("DoodleNet");
+    score_sound = new Audio("score-sound.wav");
 }
 
 function setup(){
     canvas = createCanvas(280, 280);
     canvas.center();
     background("white");
+    canvas.mouseReleased(classifyCanvas);
 }
 
 function draw(){
     check_sketch();
+    strokeWeight(13);
+    stroke(0);
+    if(mouseIsPressed){
+        line(pmouseX, pmouseY, mouseX, mouseY);
+    }
 }
 
 function check_sketch(){
@@ -32,6 +39,7 @@ function check_sketch(){
         answer_holder = "set";
         score = score + 1;
         document.getElementById("score").innerHTML = "Score: " + score;
+        score_sound.play();
     }
     timer_counter = timer_counter + 1;
     document.getElementById("timer").innerHTML = "Timer: " + timer_counter;
@@ -42,6 +50,7 @@ function check_sketch(){
     if(timer_check == "completed" || answer_holder == "set"){
         timer_check = "";
         answer_holder = "";
+        timer_counter = 0;
         update_canvas();
     }
 }
@@ -52,4 +61,26 @@ function update_canvas(){
     sketch = quick_draw_data_set[random_namber];
     document.getElementById("sketchToDraw").innerHTML = "Sketch To Be Drawn: " + sketch;
     console.log("canvas updated");
+}
+
+function classifyCanvas(){
+    classifier.classify(canvas, gotResult);
+}
+
+function gotResult(error, results){
+    if(error){
+        console.error(error);
+    }
+    else{
+        console.log(results);
+        document.getElementById("label").innerHTML = "Label: " + results[0].label;
+        document.getElementById("confidence").innerHTML = "Confidence: " + Math.round(results[0].confidence * 100) + "%";
+        if(sketch == results[0].label){
+            drawn_sketch = results[0].label;
+        }
+    }
+}
+
+function clearCanvas(){
+    background("white");
 }
