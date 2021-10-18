@@ -73,9 +73,10 @@ function gotResult(error, results){
     }
     else{
         console.log(results);
-        document.getElementById("label").innerHTML = "Label: " + results[0].label;
+        result =  results[0].label.replace("_", " ");
+        document.getElementById("label").innerHTML = "Label: " + result;
         document.getElementById("confidence").innerHTML = "Confidence: " + Math.round(results[0].confidence * 100) + "%";
-        if(sketch == results[0].label){
+        if(sketch == result){
             drawn_sketch = results[0].label;
         }
     }
